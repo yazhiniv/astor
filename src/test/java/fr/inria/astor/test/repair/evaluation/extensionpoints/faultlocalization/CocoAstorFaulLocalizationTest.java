@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import fr.inria.astor.core.entities.ModificationPoint;
@@ -31,7 +30,6 @@ import spoon.reflect.declaration.CtType;
  * @author Matias Martinez
  *
  */
-@Ignore
 public class CocoAstorFaulLocalizationTest {
 
 	@Test
