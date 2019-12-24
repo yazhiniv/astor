@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
+import org.junit.runner.notification.RunListener;
 import org.junit.runners.model.InitializationError;
 
 import fr.inria.astor.core.validation.junit.filters.TestFilter;
@@ -40,10 +41,10 @@ public class JUnitExternalExecutor {
 				}
 				out += s + "-,";
 				count++;
-				if (count > 10) {
+				/*if (count > 10) {
 					out += "...and " + (r.getFailureCount() - 10) + " failures more,";
 					// break;
-				}
+				}*/
 			}
 		} catch (Exception e) {
 			// We do not care about this exception,
@@ -87,10 +88,11 @@ public class JUnitExternalExecutor {
 		Logger.getGlobal().setLevel(Level.OFF);
 		Result resultjUnit = runner.run(classes.toArray(new Class[classes.size()]));
 		System.setOut(original);
-
+	
 		return resultjUnit;
 	}
 
+	
 	protected List<Class> getClassesToRun(String[] arg) throws ClassNotFoundException {
 		TestFilter tf = new TestFilter();
 		List<Class> classes = new ArrayList<Class>();

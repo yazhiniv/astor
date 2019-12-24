@@ -235,6 +235,7 @@ public class LaucherJUnitProcess {
 	}
 
 	public Class laucherClassName() {
+		boolean b = ConfigurationProperties.getPropertyBool("logtestexecution");
 		if (ConfigurationProperties.getPropertyBool("logtestexecution"))
 			return JUnitExternalExecutor.class;
 		else
@@ -253,30 +254,56 @@ public class LaucherJUnitProcess {
 	protected TestResult getTestResult(BufferedReader in) {
 		log.debug("Analyzing output from process");
 		TestResult tr = new TestResult();
+
+		StringBuffer processOut = new StringBuffer();
 		boolean success = false;
-		String processOut = "";
 		try {
+			boolean warning=false;
 			String line;
-			while ((line = in.readLine()) != null) {
-				processOut += line + "\n";
-				if (line.startsWith(JUnitExternalExecutor.OUTSEP)) {
-					String[] resultPrinted = line.split(JUnitExternalExecutor.OUTSEP);
+			boolean isLineFinished=true;
+			String fullLine= "";
+			String lastStringPattern = "]"+JUnitExternalExecutor.OUTSEP;
+			while ((line = in.readLine()) != null) {				
+				processOut.append(line+"\n");
+				
+				if (isLineFinished)
+					fullLine=line;
+				else
+					fullLine+=line;
+				
+				if (fullLine.startsWith(JUnitExternalExecutor.OUTSEP)) {
+					if (!fullLine.endsWith(lastStringPattern)){
+						isLineFinished=false;
+						break;
+					}
+					String[] resultPrinted = fullLine.split(JUnitExternalExecutor.OUTSEP);
 					int nrtc = Integer.valueOf(resultPrinted[1]);
 					tr.casesExecuted = nrtc;
 					int nrfailing = Integer.valueOf(resultPrinted[2]);
 					tr.failures = nrfailing;
 					if (resultPrinted.length > 3 && !"".equals(resultPrinted[3])) {
-						String[] failingTestList = resultPrinted[3].replace("[", "").replace("]", "").split(",");
-						for (String failingTest : failingTestList) {
-							failingTest = failingTest.trim();
-							if (!failingTest.isEmpty() && !failingTest.equals("-"))
-								tr.failTest.add(failingTest);
+						String[] failingTestList = resultPrinted[3].replace("[", "").replace("]", "").split("-,");
+						for (String failingTestOuput : failingTestList) {
+							String[] tempRS = failingTestOuput.split(":");
+							if (tempRS.length>0){
+								String failingTest = tempRS[0].trim();
+								if (!failingTest.isEmpty() && !failingTest.equals("-"))
+									tr.failTest.add(failingTest);
+							}
 						}
 					}
+					if (tr.failures != tr.failTest.size()){
+						warning = true;
+						log.info("Warning: number of failing testcases is different to the reported one" );
+					}
 					success = true;
+					isLineFinished = true;
+					fullLine="";
 				}
 			}
-			// log.debug("Process output:\n"+ out);
+			if (warning){
+				log.info("All output file:\n"+ processOut.toString());				
+			}
 			in.close();
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -100,7 +100,7 @@ public class EvolutionarySearchEngine extends AstorCoreEngine {
 	public OperatorInstance createOperatorInstanceForPoint(ModificationPoint modificationPoint)
 			throws IllegalAccessException {
 		SuspiciousModificationPoint suspModificationPoint = (SuspiciousModificationPoint) modificationPoint;
-
+		
 		AstorOperator operatorSelected = operatorSelectionStrategy.getNextOperator(suspModificationPoint);
 
 		if (operatorSelected == null) {
@@ -254,6 +254,8 @@ public class EvolutionarySearchEngine extends AstorCoreEngine {
 		for (ModificationPoint modificationPoint : modificationPointsToProcess) {
 
 			log.debug("---analyzing modificationPoint position: " + modificationPoint.identified);
+			//edited - print current modification position
+			//log.info("---analyzing modificationPoint position: " + modificationPoint.identified);
 
 			// A point can be modified several time in the evolution
 			boolean multiPointMutation = ConfigurationProperties.getPropertyBool("multipointmodification");
@@ -272,6 +274,7 @@ public class EvolutionarySearchEngine extends AstorCoreEngine {
 					currentStat.getIngredientsStats().setAlreadyApplied(variant.getId());
 					continue;
 				}
+				//Not - edited @yazhini
 				log.debug("location: " + modificationPoint.getCodeElement().getPosition().getFile().getName()
 						+ modificationPoint.getCodeElement().getPosition().getLine());
 				log.debug("operation: " + modificationInstance);

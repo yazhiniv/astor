@@ -5,6 +5,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -71,6 +73,9 @@ public class ProcessValidator extends ProgramVariantValidator {
 					projectFacade.getProperties().getFailingTestCases(),
 					ConfigurationProperties.getPropertyInt("tmax1"));
 			long t2 = System.currentTimeMillis();
+			//My code
+			//long time = t2 - t1;
+			//log.debug("Time taken for TC execution.."+time);
 
 			if (trfailing == null) {
 				log.debug("**The validation 1 have not finished well**");
@@ -210,12 +215,14 @@ public class ProcessValidator extends ProgramVariantValidator {
 		log.debug("-Test Failing is passing, Executing regression, One by one");
 		TestResult trregressionall = new TestResult();
 		long t1 = System.currentTimeMillis();
-
+		
+		
 		for (String tc : projectFacade.getProperties().getRegressionTestCases()) {
-
+		
 			List<String> parcial = new ArrayList<String>();
 			parcial.add(tc);
 			String jvmPath = ConfigurationProperties.getProperty("jvm4testexecution");
+			
 
 			TestResult singleTestResult = p.execute(jvmPath, bc, parcial,
 					ConfigurationProperties.getPropertyInt("tmax2"));

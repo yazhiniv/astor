@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import com.gzoltar.core.GZoltar;
 import com.gzoltar.core.components.Statement;
+import com.gzoltar.core.components.count.ComponentCount;
 import com.gzoltar.core.instr.testing.TestResult;
 
 import fr.inria.astor.core.entities.ProgramVariant;
@@ -193,10 +194,16 @@ public class GZoltarFaultLocalization implements FaultLocalizationStrategy {
 			}
 
 		}
+		logger.debug("Begin running the Fault localization");
 
 		gz.run();
+		logger.debug("Finished running the Fault localization");
 		int[] sum = new int[2];
 		for (TestResult tr : gz.getTestResults()) {
+			logger.debug("involved components of tc: "+tr.getName());
+			for (ComponentCount comp:tr.getCoveredComponents()){
+				//logger.debug("count: "+comp.getCount()+"name: "+ comp.getComponent().getName());
+			}
 			String testName = tr.getName().split("#")[0];
 			if (testName.startsWith("junit")) {
 				continue;
@@ -204,7 +211,7 @@ public class GZoltarFaultLocalization implements FaultLocalizationStrategy {
 			sum[0]++;
 			sum[1] += tr.wasSuccessful() ? 0 : 1;
 			if (!tr.wasSuccessful()) {
-				logger.info("Test failt: " + tr.getName());
+				logger.debug("Test failt: " + tr.getName());
 
 				String testCaseName = testName.split("\\#")[0];
 				if (!failingTestCases.contains(testCaseName)) {
@@ -274,7 +281,7 @@ public class GZoltarFaultLocalization implements FaultLocalizationStrategy {
 		return new FaultLocalizationResult(candidates, failingTestCases);
 	}
 
-	private List<TestCaseResult> getTestCaseResults(List<TestResult> testResults, Statement gzoltarStatement) {
+	protected List<TestCaseResult> getTestCaseResults(List<TestResult> testResults, Statement gzoltarStatement) {
 		List<TestCaseResult> tcresults = new ArrayList<>();
 
 		BitSet coverage = gzoltarStatement.getCoverage();
@@ -288,10 +295,11 @@ public class GZoltarFaultLocalization implements FaultLocalizationStrategy {
 			}
 			nextTest = coverage.nextSetBit(nextTest + 1);
 		}
+		
 		return tcresults;
 	}
 
-	private boolean isSource(String compName, String srcFolder) {
+	protected boolean isSource(String compName, String srcFolder) {
 		String clRoot = compName.split("\\$")[0];
 		String[] segmentationName = clRoot.split("\\.");
 		String simpleClassName = segmentationName[segmentationName.length - 1];

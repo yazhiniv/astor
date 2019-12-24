@@ -24,6 +24,7 @@ import fr.inria.astor.core.entities.OperatorInstance;
 import fr.inria.astor.core.entities.PatchDiff;
 import fr.inria.astor.core.entities.ProgramVariant;
 import fr.inria.astor.core.entities.SuspiciousModificationPoint;
+import fr.inria.astor.core.entities.TestCaseVariantValidationResult;
 import fr.inria.astor.core.entities.VariantValidationResult;
 import fr.inria.astor.core.faultlocalization.FaultLocalizationStrategy;
 import fr.inria.astor.core.faultlocalization.cocospoon.CocoFaultLocalization;
@@ -510,6 +511,13 @@ public abstract class AstorCoreEngine implements AstorExtensionPoint {
 		if (validationResult != null) {
 			variant.setIsSolution(validationResult.isSuccessful());
 			variant.setValidationResult(validationResult);
+			
+			//update the STAT of number of executed test cases
+			if (validationResult instanceof TestCaseVariantValidationResult){
+				TestCaseVariantValidationResult testResult = (TestCaseVariantValidationResult)validationResult;
+				for(int i=0;i< testResult.getCasesExecuted();i++)
+					Stats.getCurrentStat().increment(GeneralStatEnum.NR_EXECUTED_TESTCASES);
+			}
 		}
 		return validationResult;
 	}

@@ -2,6 +2,7 @@ package fr.inria.astor.core.solutionsearch.population;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import fr.inria.astor.core.entities.ProgramVariant;
 import fr.inria.astor.core.entities.SuspiciousModificationPoint;
 import fr.inria.astor.core.faultlocalization.bridgeFLSpoon.SpoonLocationPointerLauncher;
 import fr.inria.astor.core.faultlocalization.entity.SuspiciousCode;
+import fr.inria.astor.core.faultlocalization.gzoltar.TestCaseResult;
 import fr.inria.astor.core.manipulation.MutationSupporter;
 import fr.inria.astor.core.manipulation.filters.TargetElementProcessor;
 import fr.inria.astor.core.manipulation.sourcecode.VariableResolver;
@@ -124,7 +126,7 @@ public class ProgramVariantFactory {
 				}
 
 			}
-			log.info("Total suspicious from FL: " + suspiciousList.size() + ",  "
+			log.debug("Total suspicious from FL: " + suspiciousList.size() + ",  "
 					+ progInstance.getModificationPoints().size());
 		} else {
 			// We do not have suspicious, so, we create modification for each
@@ -133,7 +135,36 @@ public class ProgramVariantFactory {
 			List<SuspiciousModificationPoint> pointsFromAllStatements = createModificationPoints(progInstance);
 			progInstance.getModificationPoints().addAll(pointsFromAllStatements);
 		}
-		log.info("Total ModPoint created: " + progInstance.getModificationPoints().size());
+		log.debug("Total ModPoint created: " + progInstance.getModificationPoints().size());
+		
+		/*
+		 * @yazhini
+		 * @ngoc
+		 * Print list of modification point.
+		 * 
+		*/
+			
+		for (ModificationPoint mp:progInstance.getModificationPoints()){
+			if (mp instanceof SuspiciousModificationPoint){
+				SuspiciousModificationPoint smp = (SuspiciousModificationPoint) mp;
+				SuspiciousCode suspiciousCode = smp.getSuspicious();				
+				log.debug("MP: \n "+mp.getCodeElement().toString() + "; suspiciousValue: " + suspiciousCode.getSuspiciousValue());
+				log.debug("coveredByTests:");
+				for(TestCaseResult tc:suspiciousCode.getCoveredByTests()){
+					log.debug("\t- " +tc.getTestCaseCompleteName() +", Passed: "+tc.isCorrect());
+					if(suspiciousCode.getCoveredByTests()!=null){
+						HashMap<String, Double> assign = new HashMap<String, Double>();
+						assign.put(tc.getTestCaseCompleteName(), suspiciousCode.getSuspiciousValue());
+						assign.forEach((key, value) -> System.out.println(key + ":" + value));
+					}
+				}
+				
+			}else
+				log.debug("MP: \n "+mp.getCodeElement().toString());
+			
+			
+		}
+	
 		int maxModPoints = ConfigurationProperties.getPropertyInt("maxmodificationpoints");
 		if (progInstance.getModificationPoints().size() > maxModPoints) {
 			progInstance.setModificationPoints(progInstance.getModificationPoints().subList(0, maxModPoints));

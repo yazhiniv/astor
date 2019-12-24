@@ -19,6 +19,7 @@ import fr.inria.astor.approaches.deeprepair.DeepRepairEngine;
 import fr.inria.astor.approaches.jgenprog.JGenProg;
 import fr.inria.astor.approaches.jkali.JKaliEngine;
 import fr.inria.astor.approaches.jmutrepair.MutationalExhaustiveRepair;
+import fr.inria.astor.approaches.mpp.MppEngine;
 import fr.inria.astor.approaches.scaffold.ScaffoldRepairEngine;
 import fr.inria.astor.core.entities.ProgramVariant;
 import fr.inria.astor.core.faultlocalization.entity.SuspiciousCode;
@@ -96,6 +97,9 @@ public class AstorMain extends AbstractMain {
 
 		} else if (ExecutionMode.SCAFFOLD.equals(mode)) {
 			astorCore = new ScaffoldRepairEngine(mutSupporter, projectFacade);
+
+		} else if (ExecutionMode.MppEngine.equals(mode)) {
+			astorCore = new MppEngine(mutSupporter, projectFacade);
 
 		} else {
 			// If the execution mode is any of the predefined, Astor

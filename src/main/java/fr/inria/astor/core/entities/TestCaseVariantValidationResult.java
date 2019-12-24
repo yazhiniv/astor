@@ -19,4 +19,5 @@ public interface TestCaseVariantValidationResult extends VariantValidationResult
 	public int getPassingTestCases();
 
 	public int getCasesExecuted();
+	
 }

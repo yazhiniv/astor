@@ -1,4 +1,5 @@
 package fr.inria.astor.core.entities;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -116,6 +117,7 @@ public class ProgramVariant {
 
 	public void setModificationPoints(List<ModificationPoint> modificationPoints) {
 		this.modificationPoints = modificationPoints;
+		
 	}
 
 	public double getFitness() {
@@ -140,12 +142,13 @@ public class ProgramVariant {
 
 	public void putModificationInstance(int generation, OperatorInstance op) {
 		List<OperatorInstance> modificationPoints = operations.get(generation);
+		
 		if (modificationPoints == null) {
 			modificationPoints = new ArrayList<OperatorInstance>();
 			operations.put(generation, modificationPoints);
-		}
+			}
+		
 		modificationPoints.add(op);
-
 	}
 
 	public Map<Integer, List<OperatorInstance>> getOperations() {
